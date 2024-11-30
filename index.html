@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <title>Life Game</title>
     <style>
         body {
@@ -14,6 +14,7 @@
             align-items: center;
             height: 100vh;
             position: relative;
+            touch-action: none; /* Prevent scrolling and zooming on touch */
         }
         .cell {
             width: 20px;
@@ -36,7 +37,7 @@
         cell.style.left = `${x - 10}px`;
         cell.style.top = `${y - 10}px`;
         cell.dataset.index = cellIndex++;
-        cells.push({ element: cell, vx: Math.random() * 2 - 1, vy: Math.random() * 2 - 1 });
+        cells.push({ element: cell, vx: Math.random() * 4 - 2, vy: Math.random() * 4 - 2 });
         document.body.appendChild(cell);
     }
 
