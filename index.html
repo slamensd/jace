@@ -40,7 +40,7 @@
             width: 50px;
             height: 50px;
             border-radius: 50%;
-            background: radial-gradient(circle, #ff4500, transparent);
+            background: radial-gradient(circle, #00ff00, #0000ff);
             animation: explode 1s ease-out forwards;
         }
         @keyframes explode {
@@ -84,9 +84,9 @@
             ctx.fill();
             ctx.closePath();
 
-            // Center circle (highest score)
+            // Center circle (highest score, reduced by 25%)
             ctx.beginPath();
-            ctx.arc(canvas.width / 2, canvas.height / 2, 100, 0, Math.PI * 2);
+            ctx.arc(canvas.width / 2, canvas.height / 2, 75, 0, Math.PI * 2);
             ctx.fillStyle = '#ff6347';
             ctx.fill();
             ctx.closePath();
@@ -103,7 +103,7 @@
             const centerY = canvas.height / 2;
             const distance = Math.sqrt(Math.pow(x - centerX, 2) + Math.pow(y - centerY, 2));
 
-            if (distance <= 100) {
+            if (distance <= 75) {
                 score += 5;
                 createFirework(x, y);
             } else if (distance <= 200) {
