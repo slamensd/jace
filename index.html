@@ -36,13 +36,13 @@
         cell.style.left = `${x - 10}px`;
         cell.style.top = `${y - 10}px`;
         cell.dataset.index = cellIndex++;
-        cells.push(cell);
+        cells.push({ element: cell, vx: Math.random() * 2 - 1, vy: Math.random() * 2 - 1 });
         document.body.appendChild(cell);
     }
 
     function multiplyCells() {
         let newCells = [];
-        for (const cell of cells) {
+        for (const { element: cell } of cells) {
             const rect = cell.getBoundingClientRect();
             const offsets = [
                 {x: -30, y: -30},
@@ -59,9 +59,52 @@
         newCells.forEach(pos => createCell(pos.x, pos.y));
     }
 
+    function updateCells() {
+        for (let i = 0; i < cells.length; i++) {
+            const cell = cells[i];
+            const rect = cell.element.getBoundingClientRect();
+
+            // Update position
+            let newX = rect.left + cell.vx;
+            let newY = rect.top + cell.vy;
+
+            // Bounce off walls
+            if (newX <= 0 || newX + rect.width >= window.innerWidth) {
+                cell.vx *= -1;
+            }
+            if (newY <= 0 || newY + rect.height >= window.innerHeight) {
+                cell.vy *= -1;
+            }
+
+            cell.element.style.left = `${newX}px`;
+            cell.element.style.top = `${newY}px`;
+
+            // Handle collisions
+            for (let j = i + 1; j < cells.length; j++) {
+                const otherCell = cells[j];
+                const otherRect = otherCell.element.getBoundingClientRect();
+
+                const dx = rect.left - otherRect.left;
+                const dy = rect.top - otherRect.top;
+                const distance = Math.sqrt(dx * dx + dy * dy);
+
+                if (distance < rect.width) {
+                    // Simple collision response by reversing velocities
+                    cell.vx *= -1;
+                    cell.vy *= -1;
+                    otherCell.vx *= -1;
+                    otherCell.vy *= -1;
+                }
+            }
+        }
+
+        requestAnimationFrame(updateCells);
+    }
+
     window.addEventListener('click', function (e) {
         if (cells.length === 0) {
             createCell(e.clientX, e.clientY);
+            requestAnimationFrame(updateCells);
         } else {
             multiplyCells();
         }
@@ -72,6 +115,7 @@
         const touch = e.touches[0];
         if (cells.length === 0) {
             createCell(touch.clientX, touch.clientY);
+            requestAnimationFrame(updateCells);
         } else {
             multiplyCells();
         }
