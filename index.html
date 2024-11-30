@@ -79,7 +79,7 @@
             
             // Second circle (lower score)
             ctx.beginPath();
-            ctx.arc(canvas.width / 2, canvas.height / 2, 400, 0, Math.PI * 2);
+            ctx.arc(canvas.width / 2, canvas.height / 2, 200, 0, Math.PI * 2);
             ctx.fillStyle = '#ffd700';
             ctx.fill();
             ctx.closePath();
@@ -105,10 +105,10 @@
 
             if (distance <= 100) {
                 score += 5;
-                createFirework(event.clientX, event.clientY);
-            } else if (distance <= 400) {
+                createFirework(x, y);
+            } else if (distance <= 200) {
                 score += 1;
-                createFirework(event.clientX, event.clientY);
+                createFirework(x, y);
             }
 
             shotsLeft--;
@@ -126,8 +126,8 @@
         function createFirework(x, y) {
             const firework = document.createElement('div');
             firework.classList.add('firework');
-            firework.style.left = `${x - gameContainer.getBoundingClientRect().left - 25}px`;
-            firework.style.top = `${y - gameContainer.getBoundingClientRect().top - 25}px`;
+            firework.style.left = `${x - 25}px`;
+            firework.style.top = `${y - 25}px`;
             gameContainer.appendChild(firework);
             setTimeout(() => {
                 firework.remove();
