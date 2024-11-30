@@ -79,7 +79,7 @@
             
             // Second circle (lower score)
             ctx.beginPath();
-            ctx.arc(canvas.width / 2, canvas.height / 2, 200, 0, Math.PI * 2);
+            ctx.arc(canvas.width / 2, canvas.height / 2, 400, 0, Math.PI * 2);
             ctx.fillStyle = '#ffd700';
             ctx.fill();
             ctx.closePath();
@@ -106,7 +106,7 @@
             if (distance <= 100) {
                 score += 5;
                 createFirework(event.clientX, event.clientY);
-            } else if (distance <= 200) {
+            } else if (distance <= 400) {
                 score += 1;
                 createFirework(event.clientX, event.clientY);
             }
