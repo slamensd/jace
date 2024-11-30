@@ -72,6 +72,7 @@
 
         let score = 0;
         let shotsLeft = 5;
+        let startY = null;
 
         // Draw the target
         function drawTarget() {
@@ -93,15 +94,13 @@
         }
 
         // Handle shot
-        function handleShot(event) {
+        function handleShot(x, y) {
             if (shotsLeft <= 0) return;
 
             const rect = canvas.getBoundingClientRect();
-            const x = event.clientX - rect.left;
-            const y = event.clientY - rect.top;
             const centerX = canvas.width / 2;
             const centerY = canvas.height / 2;
-            const distance = Math.sqrt(Math.pow(x - centerX, 2) + Math.pow(y - centerY, 2));
+            const distance = Math.sqrt(Math.pow(x - rect.left - centerX, 2) + Math.pow(y - rect.top - centerY, 2));
 
             if (distance <= 75) {
                 score += 5;
@@ -148,8 +147,29 @@
             drawTarget();
         }
 
+        // Handle swipe
+        function handleTouchStart(event) {
+            if (event.touches.length === 1) {
+                startY = event.touches[0].clientY;
+            }
+        }
+
+        function handleTouchEnd(event) {
+            if (startY === null) return;
+            const endY = event.changedTouches[0].clientY;
+            if (startY - endY > 50) { // Detect upward swipe
+                const rect = canvas.getBoundingClientRect();
+                const x = rect.left + rect.width / 2;
+                const y = rect.top + rect.height / 2;
+                handleShot(x, y);
+            }
+            startY = null;
+        }
+
         // Initialize game
-        canvas.addEventListener('click', handleShot);
+        canvas.addEventListener('click', (event) => handleShot(event.clientX, event.clientY));
+        canvas.addEventListener('touchstart', handleTouchStart);
+        canvas.addEventListener('touchend', handleTouchEnd);
         drawTarget();
     </script>
 </body>
