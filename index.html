@@ -3,174 +3,80 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bullseye Target Game</title>
-    <link rel="stylesheet" href="styles.css">
-    <link href="https://fonts.googleapis.com/css2?family=Lilita+One&display=swap" rel="stylesheet">
+    <title>Life Game</title>
     <style>
         body {
+            margin: 0;
+            overflow: hidden;
+            background-color: #f0f0f0;
             display: flex;
             justify-content: center;
             align-items: center;
             height: 100vh;
-            margin: 0;
-            background-color: #ffe4b5;
-            font-family: 'Lilita One', cursive;
-        }
-        #game-container {
-            text-align: center;
             position: relative;
         }
-        #game-canvas {
-            border: 2px solid #000;
-            background-color: #fff;
+        .cell {
+            width: 20px;
+            height: 20px;
+            background-color: red;
             border-radius: 50%;
-            width: 400px;
-            height: 400px;
-            touch-action: none;
-        }
-        #scoreboard {
-            font-size: 2em;
-            margin-bottom: 20px;
-            color: #ff4500;
-        }
-        .firework {
             position: absolute;
-            top: 50%;
-            left: 50%;
-            width: 50px;
-            height: 50px;
-            border-radius: 50%;
-            background: radial-gradient(circle, #00ff00, #0000ff);
-            animation: explode 1s ease-out forwards;
-        }
-        @keyframes explode {
-            0% {
-                transform: scale(0.1);
-                opacity: 1;
-            }
-            100% {
-                transform: scale(3);
-                opacity: 0;
-            }
         }
     </style>
 </head>
 <body>
-    <div id="game-container">
-        <div id="scoreboard">
-            Score: <span id="score">0</span> | Shots Left: <span id="shots-left">5</span>
-        </div>
-        <canvas id="game-canvas" width="400" height="400"></canvas>
-    </div>
 
-    <script>
-        const canvas = document.getElementById('game-canvas');
-        const ctx = canvas.getContext('2d');
-        const scoreDisplay = document.getElementById('score');
-        const shotsLeftDisplay = document.getElementById('shots-left');
-        const gameContainer = document.getElementById('game-container');
+<script>
+    let cells = [];
+    let cellIndex = 0;
 
-        let score = 0;
-        let shotsLeft = 5;
-        let startY = null;
+    function createCell(x, y) {
+        const cell = document.createElement('div');
+        cell.className = 'cell';
+        cell.style.left = `${x - 10}px`;
+        cell.style.top = `${y - 10}px`;
+        cell.dataset.index = cellIndex++;
+        cells.push(cell);
+        document.body.appendChild(cell);
+    }
 
-        // Draw the target
-        function drawTarget() {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            
-            // Second circle (lower score)
-            ctx.beginPath();
-            ctx.arc(canvas.width / 2, canvas.height / 2, 200, 0, Math.PI * 2);
-            ctx.fillStyle = '#ffd700';
-            ctx.fill();
-            ctx.closePath();
-
-            // Center circle (highest score, reduced by 25%)
-            ctx.beginPath();
-            ctx.arc(canvas.width / 2, canvas.height / 2, 75, 0, Math.PI * 2);
-            ctx.fillStyle = '#ff6347';
-            ctx.fill();
-            ctx.closePath();
-        }
-
-        // Handle shot
-        function handleShot(x, y) {
-            if (shotsLeft <= 0) return;
-
-            const rect = canvas.getBoundingClientRect();
-            const centerX = canvas.width / 2;
-            const centerY = canvas.height / 2;
-            const distance = Math.sqrt(Math.pow(x - rect.left - centerX, 2) + Math.pow(y - rect.top - centerY, 2));
-
-            if (distance <= 75) {
-                score += 5;
-                createFirework(x, y);
-            } else if (distance <= 200) {
-                score += 1;
-                createFirework(x, y);
-            }
-
-            shotsLeft--;
-            updateScoreboard();
-
-            if (shotsLeft === 0) {
-                setTimeout(() => {
-                    alert(`Game Over! Your final score is: ${score}`);
-                    resetGame();
-                }, 100);
+    function multiplyCells() {
+        let newCells = [];
+        for (const cell of cells) {
+            const rect = cell.getBoundingClientRect();
+            const offsets = [
+                {x: -30, y: -30},
+                {x: 30, y: -30},
+                {x: -30, y: 30},
+                {x: 30, y: 30},
+            ];
+            for (const offset of offsets) {
+                const newX = rect.left + window.scrollX + offset.x;
+                const newY = rect.top + window.scrollY + offset.y;
+                newCells.push({x: newX, y: newY});
             }
         }
+        newCells.forEach(pos => createCell(pos.x, pos.y));
+    }
 
-        // Create firework animation
-        function createFirework(x, y) {
-            const firework = document.createElement('div');
-            firework.classList.add('firework');
-            firework.style.left = `${x - 25}px`;
-            firework.style.top = `${y - 25}px`;
-            gameContainer.appendChild(firework);
-            setTimeout(() => {
-                firework.remove();
-            }, 1000);
+    window.addEventListener('click', function (e) {
+        if (cells.length === 0) {
+            createCell(e.clientX, e.clientY);
+        } else {
+            multiplyCells();
         }
+    });
 
-        // Update scoreboard
-        function updateScoreboard() {
-            scoreDisplay.textContent = score;
-            shotsLeftDisplay.textContent = shotsLeft;
+    window.addEventListener('touchstart', function (e) {
+        e.preventDefault();
+        const touch = e.touches[0];
+        if (cells.length === 0) {
+            createCell(touch.clientX, touch.clientY);
+        } else {
+            multiplyCells();
         }
+    });
+</script>
 
-        // Reset game
-        function resetGame() {
-            score = 0;
-            shotsLeft = 5;
-            updateScoreboard();
-            drawTarget();
-        }
-
-        // Handle swipe
-        function handleTouchStart(event) {
-            if (event.touches.length === 1) {
-                startY = event.touches[0].clientY;
-            }
-        }
-
-        function handleTouchEnd(event) {
-            if (startY === null) return;
-            const endY = event.changedTouches[0].clientY;
-            if (startY - endY > 50) { // Detect upward swipe
-                const rect = canvas.getBoundingClientRect();
-                const x = rect.left + rect.width / 2;
-                const y = rect.top + rect.height / 2;
-                handleShot(x, y);
-            }
-            startY = null;
-        }
-
-        // Initialize game
-        canvas.addEventListener('click', (event) => handleShot(event.clientX, event.clientY));
-        canvas.addEventListener('touchstart', handleTouchStart);
-        canvas.addEventListener('touchend', handleTouchEnd);
-        drawTarget();
-    </script>
 </body>
 </html>
