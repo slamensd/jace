@@ -21,6 +21,7 @@
             height: 400px;
             border: 2px solid #000;
             background-color: #fff;
+            overflow: hidden;
         }
 
         .character {
@@ -52,6 +53,23 @@
             left: -7.5px;
         }
 
+        .arms, .legs {
+            position: absolute;
+            width: 40px;
+            height: 5px;
+            background-color: inherit;
+        }
+
+        .arms {
+            top: 30px;
+            left: -17.5px;
+        }
+
+        .legs {
+            bottom: 0;
+            left: -17.5px;
+        }
+
         #player {
             left: 50px;
         }
@@ -69,6 +87,18 @@
             margin: 5px;
             font-size: 16px;
         }
+
+        #joystick {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .joystick-button {
+            width: 50px;
+            height: 50px;
+            font-size: 20px;
+        }
     </style>
 </head>
 <body>
@@ -76,20 +106,35 @@
         <div id="player" class="character">
             <div class="stick-figure">
                 <div class="head"></div>
+                <div class="arms"></div>
+                <div class="legs"></div>
             </div>
         </div>
         <div id="enemy" class="character">
             <div class="stick-figure red">
                 <div class="head"></div>
+                <div class="arms"></div>
+                <div class="legs"></div>
             </div>
         </div>
     </div>
     <div id="controls">
         <button onclick="punch()">Punch</button>
         <button onclick="kick()">Kick</button>
+        <button onclick="jump()">Jump</button>
+    </div>
+    <div id="joystick">
+        <button class="joystick-button" onclick="moveLeft()">⬅️</button>
+        <button class="joystick-button" onclick="moveRight()">➡️</button>
     </div>
 
     <script>
+        let player = document.getElementById('player');
+        let playerPosition = 50;
+        let isJumping = false;
+        let velocity = 0;
+        let gravity = 0.5;
+
         function animateAction(action, targetId) {
             const character = document.getElementById(targetId);
             character.classList.add(action);
@@ -110,10 +155,43 @@
             }
         }
 
+        function jump() {
+            if (!isJumping) {
+                isJumping = true;
+                velocity = -10;
+                requestAnimationFrame(jumpAnimation);
+            }
+        }
+
+        function jumpAnimation() {
+            if (isJumping) {
+                velocity += gravity;
+                player.style.bottom = `${parseInt(player.style.bottom || 0) + velocity}px`;
+                if (parseInt(player.style.bottom) <= 0) {
+                    player.style.bottom = '0px';
+                    isJumping = false;
+                } else {
+                    requestAnimationFrame(jumpAnimation);
+                }
+            }
+        }
+
+        function moveLeft() {
+            playerPosition -= 10;
+            if (playerPosition < 0) playerPosition = 0;
+            player.style.left = `${playerPosition}px`;
+        }
+
+        function moveRight() {
+            playerPosition += 10;
+            if (playerPosition > 550) playerPosition = 550;
+            player.style.left = `${playerPosition}px`;
+        }
+
         function checkCollision() {
-            const player = document.getElementById('player').getBoundingClientRect();
-            const enemy = document.getElementById('enemy').getBoundingClientRect();
-            return player.right >= enemy.left && player.left <= enemy.right;
+            const playerRect = player.getBoundingClientRect();
+            const enemyRect = document.getElementById('enemy').getBoundingClientRect();
+            return playerRect.right >= enemyRect.left && playerRect.left <= enemyRect.right;
         }
 
         function enemyHit() {
