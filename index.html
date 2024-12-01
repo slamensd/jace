@@ -65,19 +65,17 @@
 
         .legs {
             position: absolute;
-            width: 5px;
-            height: 40px;
-            background-color: inherit;
             bottom: -40px;
-            left: -17.5px;
             display: flex;
-            justify-content: space-between;
+            gap: 10px;
         }
 
         .leg {
-            width: 20px;
-            height: 5px;
-            background-color: inherit;
+            width: 0;
+            height: 40px;
+            border: 2px solid;
+            border-color: inherit;
+            transform-origin: top;
             transform: rotate(45deg);
         }
 
@@ -172,7 +170,8 @@
         let enemyHealth = 100;
         let isJumping = false;
         let velocity = 0;
-        let gravity = 0.5;
+        const gravity = 0.5;
+        const jumpSpeed = -12;
 
         function animateAction(action, targetId) {
             const character = document.getElementById(targetId);
@@ -199,7 +198,7 @@
         function jump() {
             if (!isJumping) {
                 isJumping = true;
-                velocity = -10;
+                velocity = jumpSpeed;
                 requestAnimationFrame(jumpAnimation);
             }
         }
