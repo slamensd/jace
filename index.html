@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <title>Stick Figure Fighting Game</title>
     <style>
         body {
@@ -13,6 +13,7 @@
             height: 100vh;
             background-color: #f0f0f0;
             margin: 0;
+            touch-action: manipulation;
         }
 
         #gameContainer {
@@ -34,7 +35,7 @@
 
         .stick-figure {
             width: 5px;
-            height: 100px;
+            height: 50px;
             background-color: black;
             position: relative;
         }
@@ -53,21 +54,31 @@
             left: -7.5px;
         }
 
-        .arms, .legs {
+        .arms {
             position: absolute;
             width: 40px;
             height: 5px;
             background-color: inherit;
-        }
-
-        .arms {
             top: 30px;
             left: -17.5px;
         }
 
         .legs {
-            bottom: 0;
+            position: absolute;
+            width: 5px;
+            height: 40px;
+            background-color: inherit;
+            bottom: -40px;
             left: -17.5px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .leg {
+            width: 20px;
+            height: 5px;
+            background-color: inherit;
+            transform: rotate(45deg);
         }
 
         #player {
@@ -99,6 +110,19 @@
             height: 50px;
             font-size: 20px;
         }
+
+        #healthBars {
+            display: flex;
+            justify-content: space-between;
+            width: 600px;
+            margin-top: 10px;
+        }
+
+        .health-bar {
+            width: 45%;
+            height: 20px;
+            background-color: green;
+        }
     </style>
 </head>
 <body>
@@ -107,16 +131,26 @@
             <div class="stick-figure">
                 <div class="head"></div>
                 <div class="arms"></div>
-                <div class="legs"></div>
+                <div class="legs">
+                    <div class="leg"></div>
+                    <div class="leg"></div>
+                </div>
             </div>
         </div>
         <div id="enemy" class="character">
             <div class="stick-figure red">
                 <div class="head"></div>
                 <div class="arms"></div>
-                <div class="legs"></div>
+                <div class="legs">
+                    <div class="leg"></div>
+                    <div class="leg"></div>
+                </div>
             </div>
         </div>
+    </div>
+    <div id="healthBars">
+        <div id="playerHealth" class="health-bar"></div>
+        <div id="enemyHealth" class="health-bar"></div>
     </div>
     <div id="controls">
         <button onclick="punch()">Punch</button>
@@ -130,7 +164,12 @@
 
     <script>
         let player = document.getElementById('player');
+        let enemy = document.getElementById('enemy');
+        let playerHealthBar = document.getElementById('playerHealth');
+        let enemyHealthBar = document.getElementById('enemyHealth');
         let playerPosition = 50;
+        let playerHealth = 100;
+        let enemyHealth = 100;
         let isJumping = false;
         let velocity = 0;
         let gravity = 0.5;
@@ -144,14 +183,16 @@
         function punch() {
             animateAction('punch', 'player');
             if (checkCollision()) {
-                enemyHit();
+                enemyHealth -= 10;
+                updateHealthBars();
             }
         }
 
         function kick() {
             animateAction('kick', 'player');
             if (checkCollision()) {
-                enemyHit();
+                enemyHealth -= 15;
+                updateHealthBars();
             }
         }
 
@@ -190,16 +231,34 @@
 
         function checkCollision() {
             const playerRect = player.getBoundingClientRect();
-            const enemyRect = document.getElementById('enemy').getBoundingClientRect();
-            return playerRect.right >= enemyRect.left && playerRect.left <= enemyRect.right;
+            const enemyRect = enemy.getBoundingClientRect();
+            return playerRect.right >= enemyRect.left && playerRect.left <= enemyRect.right && playerRect.bottom === enemyRect.bottom;
         }
 
         function enemyHit() {
-            const enemy = document.getElementById('enemy');
             enemy.style.transform = 'translateX(20px)';
             setTimeout(() => {
                 enemy.style.transform = 'translateX(0px)';
             }, 200);
+        }
+
+        function updateHealthBars() {
+            playerHealthBar.style.width = `${playerHealth}%`;
+            enemyHealthBar.style.width = `${enemyHealth}%`;
+            if (enemyHealth <= 0) {
+                alert('You win!');
+                resetGame();
+            }
+            if (playerHealth <= 0) {
+                alert('You lose!');
+                resetGame();
+            }
+        }
+
+        function resetGame() {
+            playerHealth = 100;
+            enemyHealth = 100;
+            updateHealthBars();
         }
     </script>
 </body>
