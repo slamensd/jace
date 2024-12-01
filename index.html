@@ -67,16 +67,20 @@
             position: absolute;
             bottom: -40px;
             display: flex;
-            gap: 10px;
+            justify-content: space-between;
+            width: 40px;
         }
 
         .leg {
-            width: 0;
+            width: 5px;
             height: 40px;
-            border: 2px solid;
-            border-color: inherit;
+            background-color: inherit;
             transform-origin: top;
-            transform: rotate(45deg);
+            transform: rotate(30deg);
+        }
+
+        .leg.right-leg {
+            transform: rotate(-30deg);
         }
 
         #player {
@@ -130,8 +134,8 @@
                 <div class="head"></div>
                 <div class="arms"></div>
                 <div class="legs">
-                    <div class="leg"></div>
-                    <div class="leg"></div>
+                    <div class="leg left-leg"></div>
+                    <div class="leg right-leg"></div>
                 </div>
             </div>
         </div>
@@ -140,8 +144,8 @@
                 <div class="head"></div>
                 <div class="arms"></div>
                 <div class="legs">
-                    <div class="leg"></div>
-                    <div class="leg"></div>
+                    <div class="leg left-leg"></div>
+                    <div class="leg right-leg"></div>
                 </div>
             </div>
         </div>
